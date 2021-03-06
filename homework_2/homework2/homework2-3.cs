@@ -33,12 +33,12 @@ namespace homework2_3
                     }
                 }
             }
-            Console.WriteLine("The prime number between min and max is: ");
+            Console.WriteLine("The prime number is: ");
             for (int i = 2; i < n; i++)
             {
                 if(array[i] != 1)
                 {
-                    Console.WriteLine(i + " ");
+                    Console.Write(i + " ");
                 }
             }
         }
