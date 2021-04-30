@@ -30,7 +30,17 @@ namespace homework5
                         orderService.AddOrder();
                         break;
                     case 2:
-                        
+                        Order order = new Order();
+                        orderService.DeleteOrder(order);
+                        break;
+                    case 3:
+                        Order order1 = new Order();
+                        orderService.ChangeOrder(order1);
+                        break;
+                    case 4:
+                        Console.WriteLine("请输入要查询的订单号：");
+                        int id = Int32.Parse(Console.ReadLine());
+                        orderService.Find(id);
                         break;
                     default:
                         break;
