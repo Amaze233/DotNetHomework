@@ -1,56 +1,71 @@
-﻿namespace homework5
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OrderSystemTest
 {
-    //客户类
+    // 客户类 
     public class Client
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Address { get; set; }
-        public int PhoneNumber { get; set; }
-
         public Client()
         {
-            this.Id = 0;
-            this.Name = "";
-            this.Address = "";
-            this.PhoneNumber = 0;
+            Name = "";
+            PhoneNumber = 0;
         }
 
-        public Client(int id,string name, string address, int phoneNumber)
+        public Client(string name, int phonenumber)
         {
-            this.Address = address;
             this.Name = name;
-            this.PhoneNumber = phoneNumber;
-            this.Id = id;
+            this.PhoneNumber = phonenumber;
+        }
+
+        //姓名
+        private string name;
+        
+        public string Name { get ; set; }
+        
+        // 电话号码
+        private int phonenumber;
+        
+        public int PhoneNumber
+        {
+            get => phonenumber;
+            set
+            {
+                if (value >= 0)
+                    phonenumber = value;
+                else
+                    throw new InvalidPhoneException(value);
+            }
         }
 
         public override string ToString()
         {
-            return $"Name:{this.Name} \t PhoneNumber{this.PhoneNumber} \t Address{this.Address}";
-        }
-
-        protected bool Equals(Client other)
-        {
-            return Name == other.Name && Address == other.Address && PhoneNumber == other.PhoneNumber;
+            return $"name: {Name}, phonenumber: {PhoneNumber}";
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Client) obj);
+            return obj is Client client &&
+                   name == client.name &&
+                   Name == client.Name &&
+                   phonenumber == client.phonenumber &&
+                   PhoneNumber == client.PhoneNumber;
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (Name != null ? Name.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Address != null ? Address.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ PhoneNumber;
-                return hashCode;
-            }
+            return HashCode.Combine(name, Name, phonenumber, PhoneNumber);
         }
+
+    }
+
+    // 电话异常
+    class InvalidPhoneException : ApplicationException
+    {
+        public InvalidPhoneException(int phonenumber)
+            : base($"\"{phonenumber}\" 电话异常！") { }
     }
 }

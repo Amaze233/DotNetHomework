@@ -1,53 +1,64 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 
-//写一个订单管理的控制台程序，能够实现添加订单、删除订单、修改订单、
-//查询订单（按照订单号、商品名称、客户、订单金额等进行查询）功能。
-//提示：主要的类有Order（订单）、OrderDetails（订单明细），OrderService（订单服务），
-//订单数据可以保存在OrderService中一个List中。在Program里面可以调用OrderService的方法完成各种订单操作。
-
-//      要求：
-//    （1）使用LINQ语言实现各种查询功能，查询结果按照订单总金额排序返回。
-//    （2）在订单删除、修改失败时，能够产生异常并显示给客户错误信息。
-//    （3）作业的订单和订单明细类需要重写Equals方法，确保添加的订单不重复，每个订单的订单明细不重复。
-//    （4）订单、订单明细、客户、货物等类添加ToString方法，用来显示订单信息。
-//    （5） OrderService提供排序方法对保存的订单进行排序。默认按照订单号排序，也可以使用Lambda表达式进行自定义排序。
-
-namespace homework5
+namespace OrderSystemTest
 {
-    internal class Program
+    class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            OrderService orderService = new OrderService();
-            bool flag = true;
-            while (flag)
+            var service = new OrderService();
+
+            var client1 = new Client("小明", 123456789);
+            var client2 = new Client("小洪", 156789324);
+            var client3 = new Client("杜克", 147852369);
+
+            var commodity1 = new Commodity("鸡蛋", 2);
+            var commodity2 = new Commodity("西红柿", 4);
+            var commodity3 = new Commodity("洋葱", 2.5);
+
+            string address1 = "北京";
+            string address2 = "上海";
+            string address3 = "武汉";
+
+            var details1 = new List<OrderDetail>();
+            details1.Add(new OrderDetail(address1, commodity1, 5));
+            details1.Add(new OrderDetail(address1, commodity3, 2));
+
+            var details2 = new List<OrderDetail>();
+            details2.Add(new OrderDetail(address2, commodity2, 10));
+            details2.Add(new OrderDetail(address2, commodity1, 20));
+            details2.Add(new OrderDetail(address2, commodity3, 5));
+
+            var details3 = new List<OrderDetail>();
+            details3.Add(new OrderDetail(address3, commodity1, 30));
+
+            var order1 = new Order(client1, details1);
+            var order2 = new Order(client2, details2);
+            var order3 = new Order(client3, details3);
+
+            service.AddOrder(order1);
+            service.AddOrder(order2);
+            service.AddOrder(order3);
+
+            //用 LINQ 语法查询
+            var result = from order in service
+                         where order.SumPrice > 10
+                         orderby order.Id
+                         select order;
+            foreach (var order in result)
             {
-                Console.WriteLine("请选择想要进行的操作：\t 1.添加订单 \t 2.删除订单 \t 3.修改订单 \t 4.查询订单");
-                int flag1 = Convert.ToInt32(Console.ReadLine());
-                switch (flag1)
-                {
-                    case 1:
-                        orderService.AddOrder();
-                        break;
-                    case 2:
-                        Order order = new Order();
-                        orderService.DeleteOrder(order);
-                        break;
-                    case 3:
-                        Order order1 = new Order();
-                        orderService.ChangeOrder(order1);
-                        break;
-                    case 4:
-                        Console.WriteLine("请输入要查询的订单号：");
-                        int id = Int32.Parse(Console.ReadLine());
-                        orderService.Find(id);
-                        break;
-                    default:
-                        break;
-                }
-                Console.WriteLine("是否继续进行业务处理(Y/N)");
-                if (Console.ReadLine() == "N")  flag = false;
+                Console.WriteLine(order);
+                Console.WriteLine("---------------------------------");
             }
+
+            service.Export("Order.xml");
+            
+            service.Import("Order.xml");
         }
     }
 }

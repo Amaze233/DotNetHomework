@@ -37,7 +37,7 @@ namespace hoemwork3_2
                         break;
                 }
             }
-            private static Random random = new Random();
+            private static readonly Random random = new Random();
         }
 
         interface Shape

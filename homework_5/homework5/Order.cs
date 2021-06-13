@@ -1,85 +1,97 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace homework5
+namespace OrderSystemTest
 {
     //订单类
+    [Serializable]
     public class Order
     {
-        public int Id { get; set; }
-        public Client Client { get; set; }
-        //订单列表
-        public List<OrderDetails> OrderDetailsList { get; set; }
-        
         public Order()
         {
             Client = new Client();
-            OrderDetailsList = new List<OrderDetails>();
+            Details = new List<OrderDetail>();
         }
 
-        public Order(Client client, List<OrderDetails> orderDetailsList)
+        public Order(Client client, List<OrderDetail> details)
         {
-            if (client == null )
-            {
-                Console.WriteLine("用户为空！！");
-            }
-            if (orderDetailsList == null )
-            {
-                Console.WriteLine("商品为空！！");
-            }
-            this.Client = client;
-            this.OrderDetailsList = orderDetailsList;
+            Client = client;
+            Details = details;
         }
 
-        public int TotalPrice
+        //订单详情id号
+        private int id = -1;
+        
+        public int Id
         {
             get
             {
-                int TotalPrice = 0;
-                foreach (var orderDetails in OrderDetailsList)
-                {
-                    TotalPrice += orderDetails.Commodity.Price * orderDetails.Amount;
-                }
-                return TotalPrice;
+                if (id >= 0)
+                    return id;
+                else
+                    throw new ApplicationException();
+            }
+                
+            set => id = value;
+        }
+
+        //客户
+        public Client Client { get; set; }
+
+        //订单详情列表
+        public List<OrderDetail> Details { get; set; }
+
+        //总价
+        public double SumPrice
+        {
+            get
+            {
+                double sum = 0;
+                Details.ForEach(detail => sum += detail.Commodity.Price * detail.Count);
+                return sum;
             }
         }
+
+        //是否包括商品
+        public bool ContainsCommodity(Commodity commodity) =>
+            Details.Find(detail => detail.Commodity.Equals(commodity)) != null;
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"id: {Id}\t");
-            sb.Append($"client: {Client}\t");
-            sb.Append($"total price: {TotalPrice}\t");
-            sb.Append("details:\t");
-            foreach (var orderDetails in OrderDetailsList)
-            {
-                sb.Append($"{OrderDetailsList}\t");
-            }
+            sb.Append($"id: {Id}\n\n")
+              .Append($"client:\n{Client}\n\n")
+              .Append($"price sum: {SumPrice}\n\n")
+              .Append("details:\n");
+            Details.ForEach(detail => sb.Append($"{detail}\n"));
             sb.Append("\n");
             return sb.ToString();
         }
 
-        protected bool Equals(Order other)
-        {
-            return Equals(Client, other.Client) && Equals(OrderDetailsList, other.OrderDetailsList);
-        }
-
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Order) obj);
+            return obj is Order order &&
+                   id == order.id &&
+                   Id == order.Id &&
+                   EqualityComparer<Client>.Default.Equals(Client, order.Client) &&
+                   EqualityComparer<List<OrderDetail>>.Default.Equals(Details, order.Details) &&
+                   SumPrice == order.SumPrice;
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return ((Client != null ? Client.GetHashCode() : 0) * 397) ^ (OrderDetailsList != null ? OrderDetailsList.GetHashCode() : 0);
-            }
+            return HashCode.Combine(id, Id, Client, Details, SumPrice);
         }
     }
-    
+
+    //异常
+    public class NullArgumentException : ApplicationException
+    {
+        public NullArgumentException(string arg)
+            : base($"\"{arg}\" 为空！") { }
+        public NullArgumentException() { }
+    }
 }

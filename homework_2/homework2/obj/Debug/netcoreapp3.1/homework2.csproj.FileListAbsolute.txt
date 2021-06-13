@@ -1,3 +1,0 @@
-E:\C#\软构\homework_2\homework2\homework2\obj\Debug\netcoreapp3.1\homework2.AssemblyInfoInputs.cache
-E:\C#\软构\homework_2\homework2\homework2\obj\Debug\netcoreapp3.1\homework2.AssemblyInfo.cs
-E:\C#\软构\homework_2\homework2\homework2\obj\Debug\netcoreapp3.1\homework2.csproj.CoreCompileInputs.cache
